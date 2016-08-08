@@ -3,7 +3,7 @@ import pack.*;
 
 class mainclass {
 	public static void main(String[] args) {
-		System.out.println("Hello World!");
+		table cards=new table("cards");
+		System.out.println(cards.select(1,"cnum"));
 	}
-
 }

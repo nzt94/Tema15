@@ -5,6 +5,7 @@ public class table {
 	private String filePath="";
 	private String[] titles;
 	private String[][] rows=new String[0][];
+
 	public int size(){
 		return rows.length;
 	}
@@ -68,7 +69,7 @@ public class table {
 				FileWriter out=new FileWriter(file.getAbsoluteFile(),false);
 				try{
 					String text="";
-					for(int i=0,i<titles.length;i++)
+					for(int i=0;i<titles.length;i++)
 						text+=titles[i]+((i+1<titles.length)?";":"");
 					text+="\r\n";
 					for(int i=0;i<rows.length;i++){
