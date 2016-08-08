@@ -5,6 +5,13 @@ public class table {
 	private String filePath="";
 	public String[] titles;
 	public String[][] rows=new String[0][];
+
+	public String select(int row,String fld){
+		return (row>=0 && row<rows.length)?rows[row][getIndex(fld)]:"";
+	}
+	public String[] getRow(int row){
+		return (row>=0 && row<rows.length)?rows[row]:null;
+	}
 	public void insert(String[] sr){
 		String[][] r=new String[rows.length+1][];
 		for(int i=0;i<rows.length;i++)
