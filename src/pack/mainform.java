@@ -129,27 +129,6 @@ public class mainform extends JFrame{
 		textArea1.setEnabled(false);//пока не выбран вопрос, неактивен
 		getContentPane().add(textArea1);
 
-		label5.setBounds(10, 317, 125, 24);
-		getContentPane().add(label5);
-		radio1.setBounds(141, 317, 93, 25);
-		radio1.setEnabled(false);//пока не выбран вопрос, неактивен
-		radio1.addChangeListener(new ChangeListener(){
-			public void stateChanged(ChangeEvent e){
-				if(radio1.isSelected())
-					radio2.setSelected(false);
-			}
-		});
-		getContentPane().add(radio1);
-		radio2.setBounds(247, 317, 93, 25);
-		radio2.setEnabled(false);//пока не выбран вопрос, неактивен
-		radio2.addChangeListener(new ChangeListener(){
-			public void stateChanged(ChangeEvent e){
-				if(radio2.isSelected())
-					radio1.setSelected(false);
-			}
-		});
-		getContentPane().add(radio2);
-
 		button4.setBounds(402, 353, 138, 24);
 		button4.setEnabled(false);//пока не выбран вопрос, неактивен
 		button4.addActionListener(new ActionListener() {
