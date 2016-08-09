@@ -5,9 +5,6 @@ import javax.swing.*;
 
 public class mainform extends JFrame{
 	private static final long serialVersionUID = 1L;
-	public table cards=new table("cards");
-	public table subjects=new table("subjects");
-	public table questions=new table("questions");
 	public mainform() {
 		super("Главная форма");
 		getContentPane().setLayout(null);
