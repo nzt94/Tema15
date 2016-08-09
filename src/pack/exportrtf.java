@@ -8,7 +8,7 @@ import javax.swing.JOptionPane;
 public class exportrtf {
 	private String templatePath="";
 	private String template="";
-	private String header="{\\rtf1\\ansi\\ansicpg1251\\deff0\\nouicompat\\deflang1049{\\fonttbl{\\f0\\fnil\\fcharset204{\\*\\fname Times New Roman;}Times New Roman CYR;}{\\f1\\fnil\\fcharset1 Segoe UI Symbol;}{\\f2\\fnil\\fcharset0 Times New Roman;}}\\viewkind4\\uc1\r\n";
+	private String header="{\\rtf1\\deflang1049{\\fonttbl{\\f0{Times New Roman}}}\r\n";
 	private String footer="\r\n}\r\n";
 	private static dbase dbo=new dbase();
 	public exportrtf(String tmpName){
@@ -44,19 +44,21 @@ public class exportrtf {
 		String signer=JOptionPane.showInputDialog("Укажите должность и имя подписанта");
 		for(int i=0;i<dbo.subjects.size();i++)
 			sname=(dbo.subjects.select(i,"sid").equals(sid))?dbo.subjects.select(i,"sname"):sname;
-		for(int i=0;i<dbo.cards.size();i++)
+		for(int i=0;i<dbo.cards.size();i++){
+			alert(dbo.cards.select(i,"sid")+"|"+sid);
 			if(dbo.cards.select(i,"sid").equals(sid)){
 				String[][] q=dbo.getQuestions(dbo.cards.select(i,"cid"));
 				String quest="";
 				for(int j=0;j<q.length;j++)
-					quest+="\\\\pard "+(j+1)+". "+q[j][3]+"\\\\par\r\n";
+					quest+="\\\\pard "+encode_rtf((j+1)+". "+q[j][3])+"\\\\par\r\n";
 				filetxt+=append(dbo.cards.select(i,"cnum"),sname,quest,date,signer);
 			}
+		}
 		File file=new File(".\\export\\export.rtf");
 		try{
 			if(!file.exists())
 				file.createNewFile();
-			OutputStreamWriter out=new OutputStreamWriter(new FileOutputStream(file.getAbsoluteFile()),"cp1251");
+			FileWriter out=new FileWriter(file.getAbsoluteFile(),false);
 			try{
 				out.write(header+filetxt+footer);
 				out.flush();
@@ -70,10 +72,24 @@ public class exportrtf {
 		}
 	}
 	private String append(String cnum,String sname,String questions,String date, String signer){
-		String str=template.replaceAll("sssDATEeee",date);
-		str=str.replaceAll("sssSNAMEeee",sname);
+		String str=template.replaceAll("sssDATEeee",encode_rtf(date));
+		str=str.replaceAll("sssSNAMEeee",encode_rtf(sname));
 		str=str.replaceAll("sssQUESTIONSeee",questions);
-		str=str.replaceAll("sssCIDeee",cnum);
-		return str.replaceAll("sssSIGNEReee",signer);
+		str=str.replaceAll("sssCIDeee",encode_rtf(cnum));
+		return str.replaceAll("sssSIGNEReee",encode_rtf(signer));
+	}
+	private String encode_rtf(String s){
+		String s3="";
+		try {
+			byte[] arr=s.getBytes("cp1251");
+			for(int i=0;i<arr.length;i++){
+				int j=arr[i]>0?arr[i]:256+arr[i];
+				s3+=((j<15)?"\\\\'0":"\\\\'")+Integer.toString(j, 16);
+			}
+		}
+		catch(UnsupportedEncodingException e){
+			s3=s;
+		}
+		return s3;
 	}
 }
