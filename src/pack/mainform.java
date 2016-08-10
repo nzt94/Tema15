@@ -2,11 +2,9 @@ package pack;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.event.*;
 
 public class mainform extends JFrame{
 	private static final long serialVersionUID = 1L;
-	private static exportrtf rtfo=new exportrtf("template");
 	private static dbase dbo=new dbase();
 
 	public Label label1 = new Label("Список дисциплин");
@@ -36,7 +34,6 @@ public class mainform extends JFrame{
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setBounds(50, 50, 800, 480);
 		setExtendedState(MAXIMIZED_BOTH);
-		setVisible(true);
 
 		label1.setBounds(10, 10, 125, 24);
 		getContentPane().add(label1);
@@ -186,8 +183,8 @@ public class mainform extends JFrame{
 		button6.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				//Отменить и загрузить данные до изменения
-				exportrtf rtf=new exportrtf("template");
-				rtf.export(hiddenchoice1[choice1.getSelectedIndex()]);
+				export rtf=new export("template");
+				rtf.save(hiddenchoice1[choice1.getSelectedIndex()]);
 			}
 		});
 		button6.setEnabled(false);

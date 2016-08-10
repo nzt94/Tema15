@@ -1,19 +1,16 @@
 package pack;
 
-import java.awt.*;
 import java.io.*;
-
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
+import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-public class exportrtf {
+public class export {
 	private String templatePath="";
 	private String template="";
 	private String header="{\\rtf1\\deflang1049{\\fonttbl{\\f0{Times New Roman}}}\r\n";
 	private String footer="\r\n}\r\n";
 	private static dbase dbo=new dbase();
-	public exportrtf(String tmpName){
+	public export(String tmpName){
 		templatePath=".\\template\\"+tmpName+".rtf";
 		File file=new File(templatePath);
 		if(file.exists()){
@@ -37,7 +34,7 @@ public class exportrtf {
 			}
 		}
 	}
-	public void export(int row){
+	public void save(int row){
 		String filetxt="",sname=dbo.subjects.select(row,"sname");
 		String sid=dbo.subjects.select(row,"sid");
 		String date=JOptionPane.showInputDialog("Укажите дату подписи");
