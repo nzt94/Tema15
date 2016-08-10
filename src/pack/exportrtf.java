@@ -37,17 +37,12 @@ public class exportrtf {
 			}
 		}
 	}
-	public void alert(Object o){
-		String a=JOptionPane.showInputDialog(""+o);
-	}
 	public void export(int row){
-		String filetxt="",sname="";
+		String filetxt="",sname=dbo.subjects.select(row,"sname");
+		String sid=dbo.subjects.select(row,"sid");
 		String date=JOptionPane.showInputDialog("Укажите дату подписи");
 		String signer=JOptionPane.showInputDialog("Укажите должность и имя подписанта");
-		for(int i=0;i<dbo.subjects.size();i++)
-			sname=(dbo.subjects.select(i,"sid").equals(sid))?dbo.subjects.select(i,"sname"):sname;
 		for(int i=0;i<dbo.cards.size();i++){
-			alert(dbo.cards.select(i,"sid")+"|"+sid);
 			if(dbo.cards.select(i,"sid").equals(sid)){
 				String[][] q=dbo.getQuestions(dbo.cards.select(i,"cid"));
 				String quest="";
@@ -59,7 +54,7 @@ public class exportrtf {
 		JFileChooser savedialoge=new JFileChooser();
 		savedialoge.setDialogTitle("Экспорт файла");
 		savedialoge.setFileFilter(new FileNameExtensionFilter("*.RTF","*.*"));
-		savedialoge.setSelectedFile(new File("Билеты.rtf"));
+		savedialoge.setSelectedFile(new File(dbo.subjects.select(row,"sname")+".rtf"));
 		int ret=savedialoge.showSaveDialog(null);
 		if(ret==JFileChooser.APPROVE_OPTION){ 
 			File file=savedialoge.getSelectedFile();
@@ -93,7 +88,7 @@ public class exportrtf {
 			byte[] arr=s.getBytes("cp1251");
 			for(int i=0;i<arr.length;i++){
 				int j=arr[i]>0?arr[i]:256+arr[i];
-				s3+=((j<15)?"\\\\'0":"\\\\'")+Integer.toString(j, 16);
+				s3+=((j<16)?"\\\\'0":"\\\\'")+Integer.toString(j, 16);
 			}
 		}
 		catch(UnsupportedEncodingException e){

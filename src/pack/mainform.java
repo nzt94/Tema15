@@ -13,6 +13,7 @@ public class mainform extends JFrame{
 	public Button button1 = new Button("Добавить дисциплину");
 	public Choice choice1 = new Choice();//Список дисциплин
 	private int[] hiddenchoice1=new int[0];
+	public Button button6 = new Button("Экспортировать");
 
 	public Label label2 = new Label("Список билетов");
 	public Button button2 = new Button("Добавить билет");
@@ -28,10 +29,6 @@ public class mainform extends JFrame{
 	public TextArea textArea1 = new TextArea();
 	public Button button4 = new Button("Сохранить");
 	public Button button5 = new Button("Отмена");
-
-	public Label label5 = new Label("Экспорт в файл");
-	public TextField edit1 = new TextField();
-	public Button button6 = new Button("Экспортировать в rtf");
 
 	public mainform() {
 		super("Главная форма");
@@ -63,12 +60,9 @@ public class mainform extends JFrame{
 			public void itemStateChanged(ItemEvent e){
 				//выбор дисциплины, загрузка списка билетов
 				boolean access=choice1.getSelectedIndex()>0;
-				if(access){
-					edit1.setText(choice1.getSelectedItem()+".rtf");
+				if(access)
 					fillchoice2();
-				}
 				button2.setEnabled(access);
-				edit1.setEnabled(access);
 				button6.setEnabled(access);
 			}
 		});
@@ -188,17 +182,12 @@ public class mainform extends JFrame{
 		});
 		getContentPane().add(button5);
 
-		label5.setBounds(10, 358, 125, 24);
-		getContentPane().add(label5);
-		edit1.setBounds(141, 358, 244, 24);
-		edit1.setEnabled(false);
-		getContentPane().add(edit1);
-		button6.setBounds(402, 358, 223, 24);
+		button6.setBounds(638, 10, 125, 24);
 		button6.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				//Отменить и загрузить данные до изменения
 				exportrtf rtf=new exportrtf("template");
-				rtf.export(dbo.subjects.select(hiddenchoice1[choice1.getSelectedIndex()],"sid"));
+				rtf.export(hiddenchoice1[choice1.getSelectedIndex()]);
 			}
 		});
 		button6.setEnabled(false);
