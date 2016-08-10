@@ -109,6 +109,15 @@ public class mainform extends JFrame{
 		button3.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				/*Диалог создания вопроса*/
+				textArea1.setText(dbo.questions.select(hiddenchoice3[choice3.getSelectedIndex()],"qtext"));
+				textArea1.setEnabled(true);
+				button4.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent arg0) {
+						//Сохранение при создании
+					}
+				});
+				button4.setEnabled(true);
+				button5.setEnabled(true);
 			}
 		});
 		button3.setEnabled(false);//пока не выбран билет, неактивен
@@ -117,7 +126,26 @@ public class mainform extends JFrame{
 		choice3.setBounds(141, 72, 307, 22);
 		choice3.addItemListener(new ItemListener(){
 			public void itemStateChanged(ItemEvent e) {
-				/*выбор вопроса и отображение его в поле редактирования*/
+				//выбор вопроса и отображение его в поле редактирования
+				if(choice3.getSelectedIndex()>0){
+					textArea1.setText(dbo.questions.select(hiddenchoice3[choice3.getSelectedIndex()],"qtext"));
+					textArea1.setEnabled(true);
+					button4.addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent arg0) {
+							//Сохранение при измнении
+							String qid=dbo.questions.select(hiddenchoice3[choice3.getSelectedIndex()],"qid");
+							dbo.questions.update(qid,"qid",new String[]{
+								qid,
+								dbo.cards.select(hiddenchoice2[choice2.getSelectedIndex()],"cid"),
+								textArea1.getText()
+							});
+							dbo.questions.save();
+							fillchoice3();
+						}
+					});
+					button4.setEnabled(true);
+					button5.setEnabled(true);
+				}
 			}
 		});
 		choice3.setEnabled(false);//пока не выбран билет, неактивен
@@ -131,11 +159,6 @@ public class mainform extends JFrame{
 
 		button4.setBounds(402, 315, 138, 24);
 		button4.setEnabled(false);//пока не выбран вопрос, неактивен
-		button4.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				/*Сохранение*/
-			}
-		});
 		getContentPane().add(button4);
 		
 		button5.setBounds(546, 315, 79, 24);
