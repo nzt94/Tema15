@@ -31,7 +31,7 @@ public class table {
 			rows[j]=sr;
 	}
 	public void delete(int row){
-		if(row>0 && row<rows.length){
+		if(row>=0 && row<rows.length){
 			String[][] r=new String[rows.length-1][];
 			int i,j=0;
 			for(i=0;i<rows.length;i++)

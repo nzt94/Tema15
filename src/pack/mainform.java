@@ -8,20 +8,23 @@ public class mainform extends JFrame{
 	private static dbase dbo=new dbase();
 
 	public Label label1 = new Label("Список дисциплин");
-	public Button button1 = new Button("Добавить дисциплину");
+	public Button button1 = new Button("Добавить");
 	public Choice choice1 = new Choice();//Список дисциплин
 	private int[] hiddenchoice1=new int[0];
-	public Button button6 = new Button("Экспортировать");
+	public Button button6 = new Button("Экспорт");
+	public Button button7 = new Button("Удалить");
 
 	public Label label2 = new Label("Список билетов");
-	public Button button2 = new Button("Добавить билет");
+	public Button button2 = new Button("Добавить");
 	public Choice choice2 = new Choice();//список билетов
 	private int[] hiddenchoice2=new int[0];
+	public Button button8 = new Button("Удалить");
 
 	public Label label3 = new Label("Список вопросов");
-	public Button button3 = new Button("Добавить вопрос");
+	public Button button3 = new Button("Добавить");
 	public Choice choice3 = new Choice();//список вопросов
 	private int[] hiddenchoice3=new int[0];
+	public Button button9 = new Button("Удалить");
 
 	public Label label4 = new Label("Текст вопроса");
 	public TextArea textArea1 = new TextArea();
@@ -35,10 +38,10 @@ public class mainform extends JFrame{
 		setBounds(50, 50, 800, 480);
 		setExtendedState(MAXIMIZED_BOTH);
 
-		label1.setBounds(10, 10, 125, 24);
+		label1.setBounds(10, 10, 102, 24);
 		getContentPane().add(label1);
 
-		button1.setBounds(467, 10, 158, 24);
+		button1.setBounds(433, 10, 80, 24);
 		button1.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0){//Создание дисциплины
 				String name=""+JOptionPane.showInputDialog("Название дисциплины");
@@ -51,7 +54,7 @@ public class mainform extends JFrame{
 		});
 		getContentPane().add(button1);
 
-		choice1.setBounds(141, 12, 307, 22);
+		choice1.setBounds(118, 12, 307, 22);
 		fillchoice1();
 		choice1.addItemListener(new ItemListener(){
 			public void itemStateChanged(ItemEvent e){
@@ -61,14 +64,38 @@ public class mainform extends JFrame{
 					fillchoice2();
 				button2.setEnabled(access);
 				button6.setEnabled(access);
+				button7.setEnabled(access);
 			}
 		});
 		getContentPane().add(choice1);
+		button7.setBounds(519, 10, 80, 24);
+		button7.setEnabled(false);
+		button7.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent arg0){//Удаление дисциплины
+				int res=JOptionPane.showConfirmDialog(null,"Уверены, что хотите удалить дисциплину,\r\nвместе с ней удалятся все вопросы и билеты");
+				if(res==JOptionPane.YES_OPTION){
+					String sid=dbo.subjects.select(hiddenchoice1[choice1.getSelectedIndex()],"sid");
+					for(int i=0;i<dbo.cards.size();i++)
+						if(dbo.cards.select(i,"sid").equals(sid)){
+							for(int j=0;j<dbo.questions.size();j++)
+								if(dbo.questions.select(j,"cid").equals(dbo.cards.select(i,"cid")))
+									dbo.questions.delete(j);
+							dbo.cards.delete(i);
+						}
+					dbo.subjects.delete(hiddenchoice1[choice1.getSelectedIndex()]);
+					dbo.questions.save();
+					dbo.cards.save();
+					dbo.subjects.save();
+					fillchoice1();
+				}
+			}
+		});
+		getContentPane().add(button7);
 
-		label2.setBounds(10, 40, 125, 24);
+		label2.setBounds(10, 40, 102, 24);
 		getContentPane().add(label2);
 
-		button2.setBounds(467, 40, 158, 24);
+		button2.setBounds(433, 40, 80, 24);
 		button2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				//Создание билета, скорее всего, тоже, запрос названия билета
@@ -83,7 +110,7 @@ public class mainform extends JFrame{
 		button2.setEnabled(false);//пока не выбрана дициплина, неактивен
 		getContentPane().add(button2);
 
-		choice2.setBounds(141, 42, 307, 22);
+		choice2.setBounds(118, 42, 307, 22);
 		choice2.addItemListener(new ItemListener(){
 			public void itemStateChanged(ItemEvent e) {
 				//выбор дисциплины и закрузка списка вопросов в билете
@@ -93,17 +120,37 @@ public class mainform extends JFrame{
 				button5.setEnabled(false);
 				if(choice2.getSelectedIndex()>0){
 					button3.setEnabled(true);
+					button8.setEnabled(true);
 					fillchoice3();
 				}
 			}
 		});
 		choice2.setEnabled(false);//пока не выбрана дициплина, неактивен
 		getContentPane().add(choice2);
+		button8.setEnabled(false);
+		button8.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				//Удаление билета
+				int res=JOptionPane.showConfirmDialog(null,"Уверены, что хотите удалить билет,\r\nвместе с ним удалятся все вопросы");
+				if(res==JOptionPane.YES_OPTION){
+					String сid=dbo.cards.select(hiddenchoice2[choice2.getSelectedIndex()],"сid");
+					for(int i=0;i<dbo.questions.size();i++)
+						if(dbo.questions.select(i,"cid").equals(сid))
+							dbo.questions.delete(i);
+					dbo.cards.delete(hiddenchoice2[choice2.getSelectedIndex()]);
+					dbo.questions.save();
+					dbo.cards.save();
+					fillchoice2();
+				}
+			}
+		});
+		button8.setBounds(519, 40, 80, 24);
+		getContentPane().add(button8);
 
-		label3.setBounds(10, 70, 125, 24);
+		label3.setBounds(10, 70, 102, 24);
 		getContentPane().add(label3);
 
-		button3.setBounds(467, 70, 158, 24);
+		button3.setBounds(433, 70, 80, 24);
 		button3.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				/*Диалог создания вопроса*/
@@ -128,7 +175,7 @@ public class mainform extends JFrame{
 		button3.setEnabled(false);//пока не выбран билет, неактивен
 		getContentPane().add(button3);
 
-		choice3.setBounds(141, 72, 307, 22);
+		choice3.setBounds(118, 72, 307, 22);
 		choice3.addItemListener(new ItemListener(){
 			public void itemStateChanged(ItemEvent e) {
 				//выбор вопроса и отображение его в поле редактирования
@@ -150,23 +197,38 @@ public class mainform extends JFrame{
 					});
 					button4.setEnabled(true);
 					button5.setEnabled(true);
+					button9.setEnabled(true);
 				}
 			}
 		});
 		choice3.setEnabled(false);//пока не выбран билет, неактивен
 		getContentPane().add(choice3);
+		button9.setEnabled(false);
+		button9.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				//Удаление вопроса
+				int res=JOptionPane.showConfirmDialog(null,"Уверены, что хотите удалить вопрос");
+				if(res==JOptionPane.YES_OPTION){
+					dbo.questions.delete(hiddenchoice3[choice3.getSelectedIndex()]);
+					dbo.questions.save();
+					fillchoice3();
+				}
+			}
+		});
+		button9.setBounds(519, 70, 80, 24);
+		getContentPane().add(button9);
 
-		label4.setBounds(10, 119, 125, 24);
+		label4.setBounds(10, 100, 102, 24);
 		getContentPane().add(label4);
-		textArea1.setBounds(141, 119, 484, 180);
+		textArea1.setBounds(118, 102, 567, 180);
 		textArea1.setEnabled(false);//пока не выбран вопрос, неактивен
 		getContentPane().add(textArea1);
 
-		button4.setBounds(402, 315, 138, 24);
+		button4.setBounds(519, 288, 80, 24);
 		button4.setEnabled(false);//пока не выбран вопрос, неактивен
 		getContentPane().add(button4);
 		
-		button5.setBounds(546, 315, 79, 24);
+		button5.setBounds(605, 288, 80, 24);
 		button5.setEnabled(false);//пока не выбран вопрос, неактивен
 		button5.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -179,7 +241,8 @@ public class mainform extends JFrame{
 		});
 		getContentPane().add(button5);
 
-		button6.setBounds(638, 10, 125, 24);
+		button6.setBounds(605, 10, 80, 24);
+		button6.setEnabled(false);
 		button6.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				//Отменить и загрузить данные до изменения
@@ -187,8 +250,9 @@ public class mainform extends JFrame{
 				rtf.save(hiddenchoice1[choice1.getSelectedIndex()]);
 			}
 		});
-		button6.setEnabled(false);
 		getContentPane().add(button6);
+		
+
 	}
 	private void fillchoice1(){
 		choice1.removeAll();
