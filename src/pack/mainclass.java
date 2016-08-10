@@ -7,6 +7,6 @@ import javax.sql.DataSource;
 
 class mainclass {
 	private static mainform form1 = new mainform();
-	public static void main(String[] args) {
+	public static void main(String[] args){
 	}
 }

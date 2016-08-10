@@ -2,8 +2,7 @@ package pack;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
+import javax.swing.event.*;
 
 public class mainform extends JFrame{
 	private static final long serialVersionUID = 1L;
@@ -27,13 +26,13 @@ public class mainform extends JFrame{
 
 	public Label label4 = new Label("Текст вопроса");
 	public TextArea textArea1 = new TextArea();
-
-	public Label label5 = new Label("Тип вопроса");
-	public JRadioButton radio1 = new JRadioButton("Практика");
-	public JRadioButton radio2 = new JRadioButton("Теория");
-
 	public Button button4 = new Button("Сохранить");
 	public Button button5 = new Button("Отмена");
+
+	public Label label5 = new Label("Экспорт в файл");
+	public TextField edit1 = new TextField();
+	public Button button6 = new Button("Экспортировать в rtf");
+
 	public mainform() {
 		super("Главная форма");
 		getContentPane().setLayout(null);
@@ -63,10 +62,14 @@ public class mainform extends JFrame{
 		choice1.addItemListener(new ItemListener(){
 			public void itemStateChanged(ItemEvent e){
 				//выбор дисциплины, загрузка списка билетов
-				if(choice1.getSelectedIndex()>0){
-					button2.setEnabled(true);
+				boolean access=choice1.getSelectedIndex()>0;
+				if(access){
+					edit1.setText(choice1.getSelectedItem()+".rtf");
 					fillchoice2();
 				}
+				button2.setEnabled(access);
+				edit1.setEnabled(access);
+				button6.setEnabled(access);
 			}
 		});
 		getContentPane().add(choice1);
@@ -93,6 +96,10 @@ public class mainform extends JFrame{
 		choice2.addItemListener(new ItemListener(){
 			public void itemStateChanged(ItemEvent e) {
 				//выбор дисциплины и закрузка списка вопросов в билете
+				textArea1.setText("");
+				textArea1.setEnabled(false);
+				button4.setEnabled(false);
+				button5.setEnabled(false);
 				if(choice2.getSelectedIndex()>0){
 					button3.setEnabled(true);
 					fillchoice3();
@@ -109,11 +116,18 @@ public class mainform extends JFrame{
 		button3.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				/*Диалог создания вопроса*/
-				textArea1.setText(dbo.questions.select(hiddenchoice3[choice3.getSelectedIndex()],"qtext"));
+				textArea1.setText("");
 				textArea1.setEnabled(true);
 				button4.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent arg0) {
 						//Сохранение при создании
+						dbo.questions.insert(new String[]{
+							""+(dbo.questions.size()+1),
+							dbo.cards.select(hiddenchoice2[choice2.getSelectedIndex()],"cid"),
+							textArea1.getText()
+						});
+						dbo.questions.save();
+						fillchoice3();
 					}
 				});
 				button4.setEnabled(true);
@@ -165,10 +179,30 @@ public class mainform extends JFrame{
 		button5.setEnabled(false);//пока не выбран вопрос, неактивен
 		button5.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				/*Отменить и загрузить данные до изменения*/
+				//Отменить и загрузить данные до изменения
+				textArea1.setText("");
+				textArea1.setEnabled(false);
+				button4.setEnabled(false);
+				button5.setEnabled(false);
 			}
 		});
 		getContentPane().add(button5);
+
+		label5.setBounds(10, 358, 125, 24);
+		getContentPane().add(label5);
+		edit1.setBounds(141, 358, 244, 24);
+		edit1.setEnabled(false);
+		getContentPane().add(edit1);
+		button6.setBounds(402, 358, 223, 24);
+		button6.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				//Отменить и загрузить данные до изменения
+				exportrtf rtf=new exportrtf("template");
+				rtf.export(dbo.subjects.select(hiddenchoice1[choice1.getSelectedIndex()],"sid"));
+			}
+		});
+		button6.setEnabled(false);
+		getContentPane().add(button6);
 	}
 	private void fillchoice1(){
 		choice1.removeAll();
@@ -198,6 +232,9 @@ public class mainform extends JFrame{
 					hiddenchoice2[j++]=i;
 			choice2.setEnabled(true);
 		}
+		choice3.removeAll();
+		choice3.setEnabled(false);
+		choice3.addItem("Выберите вопрос");
 	}
 	private void fillchoice3(){
 		choice3.removeAll();

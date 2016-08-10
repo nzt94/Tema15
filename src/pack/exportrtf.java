@@ -3,7 +3,9 @@ package pack;
 import java.awt.*;
 import java.io.*;
 
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class exportrtf {
 	private String templatePath="";
@@ -38,7 +40,7 @@ public class exportrtf {
 	public void alert(Object o){
 		String a=JOptionPane.showInputDialog(""+o);
 	}
-	public void export(String sid){
+	public void export(int row){
 		String filetxt="",sname="";
 		String date=JOptionPane.showInputDialog("Укажите дату подписи");
 		String signer=JOptionPane.showInputDialog("Укажите должность и имя подписанта");
@@ -50,25 +52,32 @@ public class exportrtf {
 				String[][] q=dbo.getQuestions(dbo.cards.select(i,"cid"));
 				String quest="";
 				for(int j=0;j<q.length;j++)
-					quest+="\\\\pard "+encode_rtf((j+1)+". "+q[j][3])+"\\\\par\r\n";
+					quest+="\\\\pard "+encode_rtf((j+1)+". "+q[j][2])+"\\\\par\r\n";
 				filetxt+=append(dbo.cards.select(i,"cnum"),sname,quest,date,signer);
 			}
 		}
-		File file=new File(".\\export\\export.rtf");
-		try{
-			if(!file.exists())
-				file.createNewFile();
-			FileWriter out=new FileWriter(file.getAbsoluteFile(),false);
+		JFileChooser savedialoge=new JFileChooser();
+		savedialoge.setDialogTitle("Экспорт файла");
+		savedialoge.setFileFilter(new FileNameExtensionFilter("*.RTF","*.*"));
+		savedialoge.setSelectedFile(new File("Билеты.rtf"));
+		int ret=savedialoge.showSaveDialog(null);
+		if(ret==JFileChooser.APPROVE_OPTION){ 
+			File file=savedialoge.getSelectedFile();
 			try{
-				out.write(header+filetxt+footer);
-				out.flush();
+				if(!file.exists())
+					file.createNewFile();
+				FileWriter out=new FileWriter(file.getAbsoluteFile(),false);
+				try{
+					out.write(header+filetxt+footer);
+					out.flush();
+				}
+				finally{
+					out.close();
+				}
 			}
-			finally{
-				out.close();
+			catch(IOException e){
+				throw new RuntimeException(e);
 			}
-		}
-		catch(IOException e){
-			throw new RuntimeException(e);
 		}
 	}
 	private String append(String cnum,String sname,String questions,String date, String signer){
@@ -80,7 +89,7 @@ public class exportrtf {
 	}
 	private String encode_rtf(String s){
 		String s3="";
-		try {
+		try{
 			byte[] arr=s.getBytes("cp1251");
 			for(int i=0;i<arr.length;i++){
 				int j=arr[i]>0?arr[i]:256+arr[i];
