@@ -35,22 +35,24 @@ public class export {
 		}
 	}
 	public void save(int row){
-		String filetxt="",sname=dbo.subjects.select(row,"sname");
-		String sid=dbo.subjects.select(row,"sid");
-		String date=JOptionPane.showInputDialog("Укажите дату подписи");
-		String signer=JOptionPane.showInputDialog("Укажите должность и имя подписанта");
+		String filetxt="";
 		for(int i=0;i<dbo.cards.size();i++){
-			if(dbo.cards.select(i,"sid").equals(sid)){
-				String[][] q=dbo.getQuestions(dbo.cards.select(i,"cid"));
+			if(dbo.cards.select(i,"sid").equals(dbo.subjects.select(row,"sid"))){
+				int k=1;
 				String quest="";
-				for(int j=0;j<q.length;j++)
-					quest+="\\\\pard "+encode_rtf((j+1)+". "+q[j][2])+"\\\\par\r\n";
-				filetxt+=append(dbo.cards.select(i,"cnum"),sname,quest,date,signer);
+				for(int j=0;j<dbo.questions.size();j++)
+					if(dbo.questions.select(j,"cid").equals(dbo.cards.select(i,"cid")))
+						quest+="\\\\pard "+encode_rtf((k++)+". "+dbo.questions.select(j,"qtext"))+"\\\\par\r\n";
+				filetxt+=append(
+					dbo.cards.select(i,"cnum"),
+					dbo.subjects.select(row,"sname"),
+					quest
+				);
 			}
 		}
 		JFileChooser savedialoge=new JFileChooser();
 		savedialoge.setDialogTitle("Экспорт файла");
-		savedialoge.setFileFilter(new FileNameExtensionFilter("*.RTF","*.*"));
+		savedialoge.setFileFilter(new FileNameExtensionFilter("*.rtf","*.*"));
 		savedialoge.setSelectedFile(new File(dbo.subjects.select(row,"sname")+".rtf"));
 		int ret=savedialoge.showSaveDialog(null);
 		if(ret==JFileChooser.APPROVE_OPTION){ 
@@ -72,12 +74,10 @@ public class export {
 			}
 		}
 	}
-	private String append(String cnum,String sname,String questions,String date, String signer){
-		String str=template.replaceAll("sssDATEeee",encode_rtf(date));
-		str=str.replaceAll("sssSNAMEeee",encode_rtf(sname));
+	private String append(String cnum,String sname,String questions){
+		String str=template.replaceAll("sssSNAMEeee",encode_rtf(sname));
 		str=str.replaceAll("sssQUESTIONSeee",questions);
-		str=str.replaceAll("sssCIDeee",encode_rtf(cnum));
-		return str.replaceAll("sssSIGNEReee",encode_rtf(signer));
+		return str.replaceAll("sssCNUMeee",encode_rtf(cnum));
 	}
 	private String encode_rtf(String s){
 		String s3="";
