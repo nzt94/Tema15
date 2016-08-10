@@ -6,17 +6,24 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 public class mainform extends JFrame{
+	private static final long serialVersionUID = 1L;
+	private static exportrtf rtfo=new exportrtf("template");
+	private static dbase dbo=new dbase();
+
 	public Label label1 = new Label("Список дисциплин");
 	public Button button1 = new Button("Добавить дисциплину");
 	public Choice choice1 = new Choice();//Список дисциплин
+	private int[] hiddenchoice1=new int[0];
 
 	public Label label2 = new Label("Список билетов");
 	public Button button2 = new Button("Добавить билет");
 	public Choice choice2 = new Choice();//список билетов
+	private int[] hiddenchoice2=new int[0];
 
 	public Label label3 = new Label("Список вопросов");
 	public Button button3 = new Button("Добавить вопрос");
 	public Choice choice3 = new Choice();//список вопросов
+	private int[] hiddenchoice3=new int[0];
 
 	public Label label4 = new Label("Текст вопроса");
 	public TextArea textArea1 = new TextArea();
@@ -27,13 +34,6 @@ public class mainform extends JFrame{
 
 	public Button button4 = new Button("Сохранить");
 	public Button button5 = new Button("Отмена");
-	
-	
-	
-	
-	private static final long serialVersionUID = 1L;
-	private static exportrtf rtfo=new exportrtf("template");
-	private static dbase dbo=new dbase();
 	public mainform() {
 		super("Главная форма");
 		getContentPane().setLayout(null);
@@ -129,7 +129,7 @@ public class mainform extends JFrame{
 		textArea1.setEnabled(false);//пока не выбран вопрос, неактивен
 		getContentPane().add(textArea1);
 
-		button4.setBounds(402, 353, 138, 24);
+		button4.setBounds(402, 315, 138, 24);
 		button4.setEnabled(false);//пока не выбран вопрос, неактивен
 		button4.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -138,7 +138,7 @@ public class mainform extends JFrame{
 		});
 		getContentPane().add(button4);
 		
-		button5.setBounds(546, 353, 79, 24);
+		button5.setBounds(546, 315, 79, 24);
 		button5.setEnabled(false);//пока не выбран вопрос, неактивен
 		button5.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -149,31 +149,49 @@ public class mainform extends JFrame{
 	}
 	private void fillchoice1(){
 		choice1.removeAll();
+		hiddenchoice1=new int[dbo.subjects.size()+1];
 		choice1.addItem("Выберите дисциплину");
-		for(int i=0;i<dbo.subjects.size();i++)
+		hiddenchoice1[0]=-1;
+		int j=1;
+		for(int i=0;i<dbo.subjects.size();i++){
 			choice1.addItem(dbo.subjects.select(i,"sname"));
-		
+			hiddenchoice1[j++]=i;
+		}
 	}
 	private void fillchoice2(){
 		choice2.removeAll();
 		choice2.setEnabled(false);
 		choice2.addItem("Выберите билет");
+		String sid=dbo.subjects.select(hiddenchoice1[choice1.getSelectedIndex()],"sid");
 		for(int i=0;i<dbo.cards.size();i++)
-			if(dbo.cards.select(i,"sid").equals(""+choice1.getSelectedIndex()))
-				choice2.addItem(dbo.cards.select(i,"cid"));
-		if(choice2.getItemCount()>1)
+			if(dbo.cards.select(i,"sid").equals(sid))
+				choice2.addItem(dbo.cards.select(i,"cnum"));
+		hiddenchoice2=new int[choice2.getItemCount()];
+		hiddenchoice2[0]=-1;
+		if(choice2.getItemCount()>1){
+			int j=1;
+			for(int i=0;i<dbo.cards.size();i++)
+				if(dbo.cards.select(i,"sid").equals(sid))
+					hiddenchoice2[j++]=i;
 			choice2.setEnabled(true);
-		
+		}
 	}
 	private void fillchoice3(){
 		choice3.removeAll();
 		choice3.setEnabled(false);
 		choice3.addItem("Выберите вопрос");
+		String cid=dbo.cards.select(hiddenchoice2[choice2.getSelectedIndex()],"cid");
 		for(int i=0;i<dbo.questions.size();i++)
-			if(dbo.questions.select(i,"cid").equals(choice2.getSelectedItem()))
-				choice3.addItem(dbo.questions.select(i,"qid"));
-		if(choice3.getItemCount()>1)
+			if(dbo.questions.select(i,"cid").equals(cid))
+				choice3.addItem(dbo.questions.select(i,"qtext"));
+		hiddenchoice3=new int[choice3.getItemCount()];
+		hiddenchoice3[0]=-1;
+		if(choice3.getItemCount()>1){
+			int j=1;
+			for(int i=0;i<dbo.questions.size();i++)
+				if(dbo.questions.select(i,"cid").equals(cid))
+					hiddenchoice3[j++]=i;
 			choice3.setEnabled(true);
-		
+		}
 	}
 }
