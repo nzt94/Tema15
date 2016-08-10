@@ -2,39 +2,17 @@ package pack;
 
 import java.io.*;
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class export {
-	private String templatePath="";
+	private File templateFile=null;
+	private boolean tmpLoaded=false;
 	private String template="";
 	private String header="{\\rtf1\\deflang1049{\\fonttbl{\\f0{Times New Roman}}}\r\n";
 	private String footer="\r\n}\r\n";
 	private static dbase dbo=new dbase();
-	public export(String tmpName){
-		templatePath=".\\template\\"+tmpName+".rtf";
-		File file=new File(templatePath);
-		if(file.exists()){
-			try{
-				BufferedReader in=new BufferedReader(new FileReader(file.getAbsoluteFile()));
-				try{
-					String s="",sl="";
-					int i=0;
-					while((sl=in.readLine())!=null)
-						s+=sl+"\r\n";
-					while(s.indexOf("\\par",i)>=0)
-						i=s.indexOf("\\par",i)+4;
-					template=s.substring(s.indexOf("\\pard"),i);
-				}
-				finally{
-					in.close();
-				}
-			}
-			catch(IOException e){
-				throw new RuntimeException(e);
-			}
-		}
-	}
 	public void save(int row){
+		if(tmpLoaded==false)
+			addTemplate();
 		String filetxt="";
 		for(int i=0;i<dbo.cards.size();i++){
 			if(dbo.cards.select(i,"sid").equals(dbo.subjects.select(row,"sid"))){
@@ -52,10 +30,9 @@ public class export {
 		}
 		JFileChooser savedialoge=new JFileChooser();
 		savedialoge.setDialogTitle("Экспорт файла");
-		savedialoge.setFileFilter(new FileNameExtensionFilter("*.rtf","*.*"));
 		savedialoge.setSelectedFile(new File(dbo.subjects.select(row,"sname")+".rtf"));
 		int ret=savedialoge.showSaveDialog(null);
-		if(ret==JFileChooser.APPROVE_OPTION){ 
+		if(ret==JFileChooser.APPROVE_OPTION){
 			File file=savedialoge.getSelectedFile();
 			try{
 				if(!file.exists())
@@ -92,5 +69,34 @@ public class export {
 			s3=s;
 		}
 		return s3;
+	}
+	public void addTemplate(){
+		JFileChooser opendialoge=new JFileChooser();
+		opendialoge.setDialogTitle("Укажите файл шаблона");
+		int ret=opendialoge.showOpenDialog(null);
+		if(ret==JFileChooser.APPROVE_OPTION)
+			templateFile=opendialoge.getSelectedFile();
+		if(templateFile.exists()){
+			try{
+				BufferedReader in=new BufferedReader(new FileReader(templateFile.getAbsoluteFile()));
+				try{
+					template="";
+					String s="",sl="";
+					int i=0;
+					while((sl=in.readLine())!=null)
+						s+=sl+"\r\n";
+					while(s.indexOf("\\par",i)>=0)
+						i=s.indexOf("\\par",i)+4;
+					template=s.substring(s.indexOf("\\pard"),i);
+					tmpLoaded=true;
+				}
+				finally{
+					in.close();
+				}
+			}
+			catch(IOException e){
+				throw new RuntimeException(e);
+			}
+		}
 	}
 }

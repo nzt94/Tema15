@@ -5,6 +5,7 @@ import javax.swing.*;
 
 public class mainform extends JFrame{
 	private static final long serialVersionUID = 1L;
+	private export rtf=new export();
 	private static dbase dbo=new dbase();
 
 	public Label label1 = new Label("Список дисциплин");
@@ -246,7 +247,6 @@ public class mainform extends JFrame{
 		button6.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				//Отменить и загрузить данные до изменения
-				export rtf=new export("template");
 				rtf.save(hiddenchoice1[choice1.getSelectedIndex()]);
 			}
 		});
