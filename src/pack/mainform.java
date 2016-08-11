@@ -1,6 +1,9 @@
 package pack;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
+
+import javax.imageio.ImageIO;
 import javax.swing.*;
 
 public class mainform extends JFrame{
@@ -32,6 +35,20 @@ public class mainform extends JFrame{
 	public Button button4 = new Button("Сохранить");
 	public Button button5 = new Button("Отмена");
 
+	public Label label5 = new Label("Пример шаблона");
+	public JPanel panel1=new JPanel(){
+		private static final long serialVersionUID = 1L;
+		public void paint(Graphics g) {
+	        super.paint(g);
+			Image img;
+			try {
+				img=(Image)ImageIO.read(new File(".\\tmp.png"));
+				g.drawImage(img,0,0,null);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+	    }
+	};
 	public mainform() {
 		super("Главная форма");
 		getContentPane().setLayout(null);
@@ -251,8 +268,11 @@ public class mainform extends JFrame{
 			}
 		});
 		getContentPane().add(button6);
-		
 
+		label5.setBounds(10, 316, 102, 50);
+		getContentPane().add(label5);
+		panel1.setBounds(118, 318, 567, 282);
+		getContentPane().add(panel1);
 	}
 	private void fillchoice1(){
 		choice1.removeAll();
