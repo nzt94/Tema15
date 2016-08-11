@@ -52,7 +52,7 @@ public class table {
 		File file = new File(filePath);
 		if (file.exists()) {
 			try {
-				BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(file),"UTF8"));
+				BufferedReader in=new BufferedReader(new InputStreamReader(new FileInputStream(file),"UTF8"));
 				try {
 					String s;
 					if ((s = in.readLine()) != null)
