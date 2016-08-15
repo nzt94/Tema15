@@ -2,6 +2,8 @@ package pack;
 
 import java.io.*;
 
+import javax.swing.JOptionPane;
+
 public class table {
 	private String filePath = "";
 	private String[] titles;
@@ -71,8 +73,8 @@ public class table {
 	public void save() {
 		File file = new File(filePath);
 		if (file.exists()) {
-			try {
-				FileWriter out = new FileWriter(file.getAbsoluteFile(), false);
+			try {								
+				BufferedWriter out=new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file.getAbsoluteFile()),"UTF-8"));
 				try {
 					String text = "";
 					for (int i = 0; i < titles.length; i++)
