@@ -53,7 +53,7 @@ public class table {
 		if (file.exists()) {
 			try {
 				BufferedReader in=new BufferedReader(new InputStreamReader(new FileInputStream(file),"UTF8"));
-				try {
+				try {//Попытка чтения файла
 					String s;
 					if ((s = in.readLine()) != null)
 						titles = s.split(";");
