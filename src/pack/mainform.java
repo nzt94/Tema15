@@ -2,9 +2,6 @@ package pack;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.io.File;
-
-import javax.imageio.ImageIO;
 import javax.swing.*;
 
 public class mainform extends JFrame {
@@ -12,45 +9,24 @@ public class mainform extends JFrame {
 	private export rtf = new export();
 	private static dbase dbo = new dbase();
 
+	public JMenuBar mainMenu = new JMenuBar();
+
 	public Label label1 = new Label("Список дисциплин");
-	public Button button1 = new Button("Добавить");
 	public Choice choice1 = new Choice();// Список дисциплин
 	private int[] hiddenchoice1 = new int[0];
-	public Button button6 = new Button("Экспорт");
-	public Button button7 = new Button("Удалить");
 
 	public Label label2 = new Label("Список билетов");
-	public Button button2 = new Button("Добавить");
 	public Choice choice2 = new Choice();// список билетов
 	private int[] hiddenchoice2 = new int[0];
-	public Button button8 = new Button("Удалить");
 
 	public Label label3 = new Label("Список вопросов");
-	public Button button3 = new Button("Добавить");
-	public Choice choice3 = new Choice();// список вопросов
+	public List choice3 = new List();// список вопросов
 	private int[] hiddenchoice3 = new int[0];
-	public Button button9 = new Button("Удалить");
 
 	public Label label4 = new Label("Текст вопроса");
 	public TextArea textArea1 = new TextArea();
 	public Button button4 = new Button("Сохранить");
 	public Button button5 = new Button("Отмена");
-
-	public Label label5 = new Label("Пример шаблона");
-	public JPanel panel1 = new JPanel() {
-		private static final long serialVersionUID = 1L;
-
-		public void paint(Graphics g) {
-			super.paint(g);
-			Image img;
-			try {
-				img = (Image) ImageIO.read(new File(".\\template.info"));
-				g.drawImage(img, 0, 0, null);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-	};
 
 	public mainform() {
 		super("Главная форма");
@@ -58,14 +34,205 @@ public class mainform extends JFrame {
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setBounds(50, 50, 800, 480);
 		setExtendedState(MAXIMIZED_BOTH);
+		menuCreate();
 
-		label1.setBounds(10, 10, 102, 24);
+		label1.setBounds(10, 10, 119, 24);
 		getContentPane().add(label1);
 
-		button1.setBounds(433, 10, 80, 24);
-		button1.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {// Создание
-															// дисциплины
+		choice1.setBounds(135, 12, 307, 22);
+		fillchoice1();
+		choice1.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent e) {
+				// выбор дисциплины, загрузка списка билетов
+				boolean access = choice1.getSelectedIndex() > 0;
+				mainMenu.getMenu(0).getItem(1).setEnabled(access);
+				mainMenu.getMenu(1).getItem(1).setEnabled(access);
+				mainMenu.getMenu(2).getItem(0).setEnabled(access);
+				mainMenu.getMenu(3).getItem(0).setEnabled(access);
+				choice2.removeAll();
+				choice2.setEnabled(access);
+				choice3.removeAll();
+				choice3.setEnabled(false);
+				if (access)
+					fillchoice2();
+			}
+		});
+		getContentPane().add(choice1);
+
+		label2.setBounds(10, 40, 119, 24);
+		getContentPane().add(label2);
+
+		choice2.setBounds(135, 42, 307, 22);
+		choice2.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent e) {
+				// выбор билета и закрузка списка вопросов в билете
+				textArea1.setText("");
+				textArea1.setEnabled(false);
+				button4.setEnabled(false);
+				button5.setEnabled(false);
+				mainMenu.getMenu(3).getItem(2).setEnabled(false);
+				boolean access=choice2.getSelectedIndex() > 0;
+				mainMenu.getMenu(1).getItem(2).setEnabled(access);
+				mainMenu.getMenu(2).getItem(1).setEnabled(access);
+				mainMenu.getMenu(3).getItem(1).setEnabled(access);
+				choice3.setEnabled(access);
+				if (access)
+					fillchoice3();
+			}
+		});
+		choice2.setEnabled(false);// пока не выбрана дициплина, неактивен
+		getContentPane().add(choice2);
+
+		label3.setBounds(10, 70, 119, 24);
+		getContentPane().add(label3);
+
+		choice3.setBounds(135, 72, 307, 100);
+		choice3.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent e) {
+				// выбор вопроса и отображение его в поле редактирования
+				boolean access=choice3.getSelectedIndex() >= 0;
+				textArea1.setEnabled(access);
+				button4.setEnabled(access);
+				button5.setEnabled(access);
+				mainMenu.getMenu(3).getItem(2).setEnabled(access);
+				if (access) {
+					textArea1.setText(dbo.questions.select(hiddenchoice3[choice3.getSelectedIndex()], "qtext"));
+					button4.addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent arg0) {
+							// Сохранение при измнении
+							String qid = dbo.questions.select(hiddenchoice3[choice3.getSelectedIndex()], "qid");
+							dbo.questions.update(qid, "qid",
+									new String[] { qid,
+											dbo.cards.select(hiddenchoice2[choice2.getSelectedIndex()], "cid"),
+											textArea1.getText() });
+							dbo.questions.save();
+							fillchoice3();
+							JOptionPane.showMessageDialog(null,"Вопрос сохранен");
+						}
+					});
+				}
+				else
+					textArea1.setText("");
+			}
+		});
+		choice3.setEnabled(false);// пока не выбран билет, неактивен
+		getContentPane().add(choice3);
+
+		label4.setBounds(10, 176, 119, 24);
+		getContentPane().add(label4);
+		textArea1.setBounds(135, 178, 567, 180);
+		textArea1.setEnabled(false);// пока не выбран вопрос, неактивен
+		getContentPane().add(textArea1);
+
+		button4.setBounds(520, 364, 80, 24);
+		button4.setEnabled(false);// пока не выбран вопрос, неактивен
+		getContentPane().add(button4);
+
+		button5.setBounds(606, 364, 80, 24);
+		button5.setEnabled(false);// пока не выбран вопрос, неактивен
+		button5.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				// Отменить и загрузить данные до изменения
+				textArea1.setText("");
+				textArea1.setEnabled(false);
+				button4.setEnabled(false);
+				button5.setEnabled(false);
+			}
+		});
+		getContentPane().add(button5);
+	}
+
+	private void fillchoice1() {
+		choice1.removeAll();
+		hiddenchoice1 = new int[dbo.subjects.size() + 1];
+		choice1.addItem("Выберите дисциплину");
+		hiddenchoice1[0] = -1;
+		int j = 1;
+		for (int i = 0; i < dbo.subjects.size(); i++) {
+			choice1.addItem(dbo.subjects.select(i, "sname"));
+			hiddenchoice1[j++] = i;
+		}
+	}
+
+	private void fillchoice2() {
+		choice2.addItem("Выберите билет");
+		String sid = dbo.subjects.select(hiddenchoice1[choice1.getSelectedIndex()], "sid");
+		for (int i = 0; i < dbo.cards.size(); i++)
+			if (dbo.cards.select(i, "sid").equals(sid))
+				choice2.addItem(dbo.cards.select(i, "cnum"));
+		hiddenchoice2 = new int[choice2.getItemCount()];
+		hiddenchoice2[0] = -1;
+		if (choice2.getItemCount() > 1) {
+			int j = 1;
+			for (int i = 0; i < dbo.cards.size(); i++)
+				if (dbo.cards.select(i, "sid").equals(sid))
+					hiddenchoice2[j++] = i;
+			choice2.setEnabled(true);
+		}
+		choice3.removeAll();
+		choice3.setEnabled(false);
+	}
+
+	private void fillchoice3() {
+		choice3.removeAll();
+		String cid = dbo.cards.select(hiddenchoice2[choice2.getSelectedIndex()], "cid");
+		for (int i = 0; i < dbo.questions.size(); i++)
+			if (dbo.questions.select(i, "cid").equals(cid))
+				choice3.add(dbo.questions.select(i, "qtext"));
+		hiddenchoice3 = new int[choice3.getItemCount()];
+		boolean access=choice3.getItemCount() > 0;
+		choice3.setEnabled(access);
+		if (access) {
+			int j = 0;
+			for (int i = 0; i < dbo.questions.size(); i++)
+				if (dbo.questions.select(i, "cid").equals(cid))
+					hiddenchoice3[j++] = i;
+		}
+	}
+	
+	private void menuCreate(){
+		JMenu fileItem = new JMenu("Файл");
+		Font font=new Font("Tahoma",Font.PLAIN,12);
+		fileItem.setFont(font);
+		JMenuItem setTemplate=new JMenuItem("Выбрать шаблон");
+		setTemplate.setFont(font);
+		setTemplate.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				// Выбор шаблона файла
+				rtf.addTemplate();
+			}
+		});
+		fileItem.add(setTemplate);
+		JMenuItem exportFile=new JMenuItem("Экспорт файла");
+		exportFile.setFont(font);
+		exportFile.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				// Экспорт файла
+				rtf.save(hiddenchoice1[choice1.getSelectedIndex()]);
+			}
+		});
+		fileItem.add(exportFile);
+		fileItem.addSeparator();
+		JMenuItem helpButton = new JMenuItem("Справка");
+		helpButton.setFont(font);
+		fileItem.add(helpButton);
+		fileItem.addSeparator();
+		JMenuItem exitButton=new JMenuItem("Выход");
+		exitButton.setFont(font);
+		fileItem.add(exitButton);
+		exitButton.addActionListener(new ActionListener() {           
+            public void actionPerformed(ActionEvent e) {
+                System.exit(0);             
+            }           
+        });
+		mainMenu.add(fileItem);
+		
+		JMenu createItem = new JMenu("Создание");
+		createItem.setFont(font);
+		JMenuItem subjectCreate=new JMenuItem("Дисциплины");
+		subjectCreate.setFont(font);
+		subjectCreate.addActionListener(new ActionListener() {           
+			public void actionPerformed(ActionEvent arg0) {// Создание дисциплины
 				String name = "" + JOptionPane.showInputDialog("Название дисциплины");
 				if (name.length() > 0) {
 					dbo.subjects.insert(new String[] { "" + (dbo.subjects.size() + 1), name });
@@ -73,56 +240,14 @@ public class mainform extends JFrame {
 					fillchoice1();
 				}
 			}
-		});
-		getContentPane().add(button1);
-
-		choice1.setBounds(118, 12, 307, 22);
-		fillchoice1();
-		choice1.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent e) {
-				// выбор дисциплины, загрузка списка билетов
-				boolean access = choice1.getSelectedIndex() > 0;
-				if (access)
-					fillchoice2();
-				button2.setEnabled(access);
-				button6.setEnabled(access);
-				button7.setEnabled(access);
-			}
-		});
-		getContentPane().add(choice1);
-		button7.setBounds(519, 10, 80, 24);
-		button7.setEnabled(false);
-		button7.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {// Удаление
-															// дисциплины
-				int res = JOptionPane.showConfirmDialog(null,
-						"Уверены, что хотите удалить дисциплину,\r\nвместе с ней удалятся все вопросы и билеты");
-				if (res == JOptionPane.YES_OPTION) {
-					String sid = dbo.subjects.select(hiddenchoice1[choice1.getSelectedIndex()], "sid");
-					for (int i = 0; i < dbo.cards.size(); i++)
-						if (dbo.cards.select(i, "sid").equals(sid)) {
-							for (int j = 0; j < dbo.questions.size(); j++)
-								if (dbo.questions.select(j, "cid").equals(dbo.cards.select(i, "cid")))
-									dbo.questions.delete(j);
-							dbo.cards.delete(i);
-						}
-					dbo.subjects.delete(hiddenchoice1[choice1.getSelectedIndex()]);
-					dbo.questions.save();
-					dbo.cards.save();
-					dbo.subjects.save();
-					fillchoice1();
-				}
-			}
-		});
-		getContentPane().add(button7);
-
-		label2.setBounds(10, 40, 102, 24);
-		getContentPane().add(label2);
-
-		button2.setBounds(433, 40, 80, 24);
-		button2.addActionListener(new ActionListener() {
+        });
+		createItem.add(subjectCreate);
+		JMenuItem cardCreate=new JMenuItem("Билета");
+		cardCreate.setFont(font);
+		cardCreate.setEnabled(false);
+		cardCreate.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				// Создание билета, скорее всего, тоже, запрос названия билета
+				// Создание билета
 				String name = JOptionPane.showInputDialog("Название билета");
 				if (name.length() > 0) {
 					dbo.cards.insert(
@@ -131,53 +256,12 @@ public class mainform extends JFrame {
 					fillchoice2();
 				}
 			}
-		});
-		button2.setEnabled(false);// пока не выбрана дициплина, неактивен
-		getContentPane().add(button2);
-
-		choice2.setBounds(118, 42, 307, 22);
-		choice2.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent e) {
-				// выбор дисциплины и закрузка списка вопросов в билете
-				textArea1.setText("");
-				textArea1.setEnabled(false);
-				button4.setEnabled(false);
-				button5.setEnabled(false);
-				if (choice2.getSelectedIndex() > 0) {
-					button3.setEnabled(true);
-					button8.setEnabled(true);
-					fillchoice3();
-				}
-			}
-		});
-		choice2.setEnabled(false);// пока не выбрана дициплина, неактивен
-		getContentPane().add(choice2);
-		button8.setEnabled(false);
-		button8.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				// Удаление билета
-				int res = JOptionPane.showConfirmDialog(null,
-						"Уверены, что хотите удалить билет,\r\nвместе с ним удалятся все вопросы");
-				if (res == JOptionPane.YES_OPTION) {
-					String сid = dbo.cards.select(hiddenchoice2[choice2.getSelectedIndex()], "сid");
-					for (int i = 0; i < dbo.questions.size(); i++)
-						if (dbo.questions.select(i, "cid").equals(сid))
-							dbo.questions.delete(i);
-					dbo.cards.delete(hiddenchoice2[choice2.getSelectedIndex()]);
-					dbo.questions.save();
-					dbo.cards.save();
-					fillchoice2();
-				}
-			}
-		});
-		button8.setBounds(519, 40, 80, 24);
-		getContentPane().add(button8);
-
-		label3.setBounds(10, 70, 102, 24);
-		getContentPane().add(label3);
-
-		button3.setBounds(433, 70, 80, 24);
-		button3.addActionListener(new ActionListener() {
+        });
+		createItem.add(cardCreate);
+		JMenuItem questionCreate=new JMenuItem("Вопроса");
+		questionCreate.setFont(font);
+		questionCreate.setEnabled(false);
+		questionCreate.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				/* Диалог создания вопроса */
 				textArea1.setText("");
@@ -195,42 +279,80 @@ public class mainform extends JFrame {
 				button4.setEnabled(true);
 				button5.setEnabled(true);
 			}
-		});
-		button3.setEnabled(false);// пока не выбран билет, неактивен
-		getContentPane().add(button3);
+        });
+		createItem.add(questionCreate);
+		mainMenu.add(createItem);
 
-		choice3.setBounds(118, 72, 307, 22);
-		choice3.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent e) {
-				// выбор вопроса и отображение его в поле редактирования
-				if (choice3.getSelectedIndex() > 0) {
-					textArea1.setText(dbo.questions.select(hiddenchoice3[choice3.getSelectedIndex()], "qtext"));
-					textArea1.setEnabled(true);
-					button4.addActionListener(new ActionListener() {
-						public void actionPerformed(ActionEvent arg0) {
-							// Сохранение при измнении
-							String qid = dbo.questions.select(hiddenchoice3[choice3.getSelectedIndex()], "qid");
-							dbo.questions.update(qid, "qid",
-									new String[] { qid,
-											dbo.cards.select(hiddenchoice2[choice2.getSelectedIndex()], "cid"),
-											textArea1.getText() });
-							dbo.questions.save();
-							fillchoice3();
+		JMenu editItem = new JMenu("Редактирование");
+		editItem.setFont(font);
+		JMenuItem subjectEdit=new JMenuItem("Дисциплины");
+		subjectEdit.setFont(font);
+		subjectEdit.setEnabled(false);
+		editItem.add(subjectEdit);
+		JMenuItem cardEdit=new JMenuItem("Билета");
+		cardEdit.setFont(font);
+		cardEdit.setEnabled(false);
+		editItem.add(cardEdit);
+		/*JMenuItem questionEdit=new JMenuItem("Вопроса");
+		questionEdit.setFont(font);
+		questionEdit.setEnabled(false);
+		editItem.add(questionEdit);*/
+		mainMenu.add(editItem);
+
+		JMenu deleteItem = new JMenu("Удаление");
+		deleteItem.setFont(font);
+		JMenuItem subjectDelete=new JMenuItem("Дисциплины");
+		subjectDelete.setFont(font);
+		subjectDelete.setEnabled(false);
+		subjectDelete.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				// Удаление дисциплины
+				int res = JOptionPane.showConfirmDialog(null,"Уверены, что хотите удалить дисциплину,\r\nвместе с ней удалятся все вопросы и билеты", "Удаление дисциплины", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+				if (res == JOptionPane.YES_OPTION) {
+					String sid = dbo.subjects.select(hiddenchoice1[choice1.getSelectedIndex()], "sid");
+					for (int i = 0; i < dbo.cards.size(); i++)
+						if (dbo.cards.select(i, "sid").equals(sid)) {
+							for (int j = 0; j < dbo.questions.size(); j++)
+								if (dbo.questions.select(j, "cid").equals(dbo.cards.select(i, "cid")))
+									dbo.questions.delete(j);
+							dbo.cards.delete(i);
 						}
-					});
-					button4.setEnabled(true);
-					button5.setEnabled(true);
-					button9.setEnabled(true);
+					dbo.subjects.delete(hiddenchoice1[choice1.getSelectedIndex()]);
+					dbo.questions.save();
+					dbo.cards.save();
+					dbo.subjects.save();
+					fillchoice1();
 				}
 			}
 		});
-		choice3.setEnabled(false);// пока не выбран билет, неактивен
-		getContentPane().add(choice3);
-		button9.setEnabled(false);
-		button9.addActionListener(new ActionListener() {
+		deleteItem.add(subjectDelete);
+		JMenuItem cardDelete=new JMenuItem("Билета");
+		cardDelete.setFont(font);
+		cardDelete.setEnabled(false);
+		cardDelete.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				// Удаление билета
+				int res = JOptionPane.showConfirmDialog(null,"Уверены, что хотите удалить билет,\r\nвместе с ним удалятся все вопросы", "Удаление билета", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+				if (res == JOptionPane.YES_OPTION) {
+					String сid = dbo.cards.select(hiddenchoice2[choice2.getSelectedIndex()], "сid");
+					for (int i = 0; i < dbo.questions.size(); i++)
+						if (dbo.questions.select(i, "cid").equals(сid))
+							dbo.questions.delete(i);
+					dbo.cards.delete(hiddenchoice2[choice2.getSelectedIndex()]);
+					dbo.questions.save();
+					dbo.cards.save();
+					fillchoice2();
+				}
+			}
+		});
+		deleteItem.add(cardDelete);
+		JMenuItem questionDelete=new JMenuItem("Вопроса");
+		questionDelete.setFont(font);
+		questionDelete.setEnabled(false);
+		questionDelete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				// Удаление вопроса
-				int res = JOptionPane.showConfirmDialog(null, "Уверены, что хотите удалить вопрос");
+				int res = JOptionPane.showConfirmDialog(null, "Уверены, что хотите удалить вопрос", "Удаление вопроса", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 				if (res == JOptionPane.YES_OPTION) {
 					dbo.questions.delete(hiddenchoice3[choice3.getSelectedIndex()]);
 					dbo.questions.save();
@@ -238,98 +360,8 @@ public class mainform extends JFrame {
 				}
 			}
 		});
-		button9.setBounds(519, 70, 80, 24);
-		getContentPane().add(button9);
-
-		label4.setBounds(10, 100, 102, 24);
-		getContentPane().add(label4);
-		textArea1.setBounds(118, 102, 567, 180);
-		textArea1.setEnabled(false);// пока не выбран вопрос, неактивен
-		getContentPane().add(textArea1);
-
-		button4.setBounds(519, 288, 80, 24);
-		button4.setEnabled(false);// пока не выбран вопрос, неактивен
-		getContentPane().add(button4);
-
-		button5.setBounds(605, 288, 80, 24);
-		button5.setEnabled(false);// пока не выбран вопрос, неактивен
-		button5.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				// Отменить и загрузить данные до изменения
-				textArea1.setText("");
-				textArea1.setEnabled(false);
-				button4.setEnabled(false);
-				button5.setEnabled(false);
-			}
-		});
-		getContentPane().add(button5);
-
-		button6.setBounds(605, 10, 80, 24);
-		button6.setEnabled(false);
-		button6.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				// Отменить и загрузить данные до изменения
-				rtf.save(hiddenchoice1[choice1.getSelectedIndex()]);
-			}
-		});
-		getContentPane().add(button6);
-
-		label5.setBounds(10, 316, 102, 50);
-		getContentPane().add(label5);
-		panel1.setBounds(118, 318, 567, 282);
-		getContentPane().add(panel1);
-	}
-
-	private void fillchoice1() {
-		choice1.removeAll();
-		hiddenchoice1 = new int[dbo.subjects.size() + 1];
-		choice1.addItem("Выберите дисциплину");
-		hiddenchoice1[0] = -1;
-		int j = 1;
-		for (int i = 0; i < dbo.subjects.size(); i++) {
-			choice1.addItem(dbo.subjects.select(i, "sname"));
-			hiddenchoice1[j++] = i;
-		}
-	}
-
-	private void fillchoice2() {
-		choice2.removeAll();
-		choice2.setEnabled(false);
-		choice2.addItem("Выберите билет");
-		String sid = dbo.subjects.select(hiddenchoice1[choice1.getSelectedIndex()], "sid");
-		for (int i = 0; i < dbo.cards.size(); i++)
-			if (dbo.cards.select(i, "sid").equals(sid))
-				choice2.addItem(dbo.cards.select(i, "cnum"));
-		hiddenchoice2 = new int[choice2.getItemCount()];
-		hiddenchoice2[0] = -1;
-		if (choice2.getItemCount() > 1) {
-			int j = 1;
-			for (int i = 0; i < dbo.cards.size(); i++)
-				if (dbo.cards.select(i, "sid").equals(sid))
-					hiddenchoice2[j++] = i;
-			choice2.setEnabled(true);
-		}
-		choice3.removeAll();
-		choice3.setEnabled(false);
-		choice3.addItem("Выберите вопрос");
-	}
-
-	private void fillchoice3() {
-		choice3.removeAll();
-		choice3.setEnabled(false);
-		choice3.addItem("Выберите вопрос");
-		String cid = dbo.cards.select(hiddenchoice2[choice2.getSelectedIndex()], "cid");
-		for (int i = 0; i < dbo.questions.size(); i++)
-			if (dbo.questions.select(i, "cid").equals(cid))
-				choice3.addItem(dbo.questions.select(i, "qtext"));
-		hiddenchoice3 = new int[choice3.getItemCount()];
-		hiddenchoice3[0] = -1;
-		if (choice3.getItemCount() > 1) {
-			int j = 1;
-			for (int i = 0; i < dbo.questions.size(); i++)
-				if (dbo.questions.select(i, "cid").equals(cid))
-					hiddenchoice3[j++] = i;
-			choice3.setEnabled(true);
-		}
+		deleteItem.add(questionDelete);
+		mainMenu.add(deleteItem);
+		setJMenuBar(mainMenu);
 	}
 }

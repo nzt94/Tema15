@@ -2,8 +2,6 @@ package pack;
 
 import java.io.*;
 
-import javax.swing.JOptionPane;
-
 public class table {
 	private String filePath = "";
 	private String[] titles;

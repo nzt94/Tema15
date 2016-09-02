@@ -12,40 +12,42 @@ public class export {
 	private static dbase dbo = new dbase();
 
 	public void save(int row) {
-		if (tmpLoaded == false)
-			addTemplate();
-		String filetxt = "";
-		for (int i = 0; i < dbo.cards.size(); i++) {
-			if (dbo.cards.select(i, "sid").equals(dbo.subjects.select(row, "sid"))) {
-				int k = 1;
-				String quest = "";
-				for (int j = 0; j < dbo.questions.size(); j++)
-					if (dbo.questions.select(j, "cid").equals(dbo.cards.select(i, "cid")))
-						quest += "\\\\pard " + encode_rtf((k++) + ". " + dbo.questions.select(j, "qtext"))
-								+ "\\\\par\r\n";
-				filetxt += append(dbo.cards.select(i, "cnum"), dbo.subjects.select(row, "sname"), quest);
-			}
-		}
-		JFileChooser savedialoge = new JFileChooser();
-		savedialoge.setDialogTitle("Экспорт файла");
-		savedialoge.setSelectedFile(new File(dbo.subjects.select(row, "sname") + ".rtf"));
-		int ret = savedialoge.showSaveDialog(null);
-		if (ret == JFileChooser.APPROVE_OPTION) {
-			File file = savedialoge.getSelectedFile();
-			try {
-				if (!file.exists())
-					file.createNewFile();
-				FileWriter out = new FileWriter(file.getAbsoluteFile(), false);
-				try {
-					out.write(header + filetxt + footer);
-					out.flush();
-				} finally {
-					out.close();
+		if (tmpLoaded){
+			String filetxt = "";
+			for (int i = 0; i < dbo.cards.size(); i++) {
+				if (dbo.cards.select(i, "sid").equals(dbo.subjects.select(row, "sid"))) {
+					int k = 1;
+					String quest = "";
+					for (int j = 0; j < dbo.questions.size(); j++)
+						if (dbo.questions.select(j, "cid").equals(dbo.cards.select(i, "cid")))
+							quest += "\\\\pard " + encode_rtf((k++) + ". " + dbo.questions.select(j, "qtext"))
+									+ "\\\\par\r\n";
+					filetxt += append(dbo.cards.select(i, "cnum"), dbo.subjects.select(row, "sname"), quest);
 				}
-			} catch (IOException e) {
-				throw new RuntimeException(e);
+			}
+			JFileChooser savedialoge = new JFileChooser();
+			savedialoge.setDialogTitle("Экспорт файла");
+			savedialoge.setSelectedFile(new File(dbo.subjects.select(row, "sname") + ".rtf"));
+			int ret = savedialoge.showSaveDialog(null);
+			if (ret == JFileChooser.APPROVE_OPTION) {
+				File file = savedialoge.getSelectedFile();
+				try {
+					if (!file.exists())
+						file.createNewFile();
+					FileWriter out = new FileWriter(file.getAbsoluteFile(), false);
+					try {
+						out.write(header + filetxt + footer);
+						out.flush();
+					} finally {
+						out.close();
+					}
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
 			}
 		}
+		else
+			JOptionPane.showMessageDialog(null,"Укажите шаблон для формирования файла");
 	}
 
 	private String append(String cnum, String sname, String questions) {
