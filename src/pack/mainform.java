@@ -28,6 +28,8 @@ public class mainform extends JFrame {
 	public Button button4 = new Button("Сохранить");
 	public Button button5 = new Button("Отмена");
 
+	public JDialog helpDialog=new JDialog(this);
+
 	public mainform() {
 		super("Главная форма");
 		getContentPane().setLayout(null);
@@ -217,24 +219,24 @@ public class mainform extends JFrame {
 		fileItem.addSeparator();
 		JMenuItem helpButton = new JMenuItem("Справка");
 		helpButton.setFont(font);
+    	helpDialog.setTitle("Справка");
+		helpDialog.getContentPane().setLayout(null);
+    	JLabel html=new JLabel("<html><h1><i>Рита придумает как оформить справку красиво</i></h1><hr>Трулала</html>");
+		html.setBounds(20,0,560,250);
+    	helpDialog.add(html);
+    	helpDialog.setResizable(false);
+		Button ok = new Button("OK");
+		ok.setBounds(260,285,80,25);
+		ok.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				helpDialog.setVisible(false);
+			}
+		});
+		helpDialog.add(ok);
 		helpButton.addActionListener(new ActionListener() {           
             public void actionPerformed(ActionEvent e) {
-            	JDialog helpDialog=new JDialog();
-            	helpDialog.setTitle("Справка");
-    			helpDialog.getContentPane().setLayout(null);
-    			helpDialog.setBounds(getWidth()/2-300,getHeight()/2-180,600,360);
-            	JLabel html=new JLabel("<html><h1><i>Рита придумает как оформить справку красиво</i></h1><hr>Трулала</html>");
-    			html.setBounds(20,0,540,250);
-            	helpDialog.add(html);
-    			JButton ok = new JButton("ok");
-    			ok.setBounds(250,250,100,40);
-    			ok.addActionListener(new ActionListener() {
-    				public void actionPerformed(ActionEvent event) {
-    					helpDialog.setVisible(false);
-    				}
-    			});
-    			helpDialog.add(ok);
-            	helpDialog.setVisible(true);         
+        		helpDialog.setBounds(getX()+getWidth()/2-300,getY()+getHeight()/2-180,600,360);
+            	helpDialog.setVisible(true);
             }           
         });
 		fileItem.add(helpButton);
