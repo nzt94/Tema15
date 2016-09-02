@@ -40,9 +40,10 @@ public class export {
 						out.flush();
 					} finally {
 						out.close();
+						JOptionPane.showMessageDialog(null,"Файл сохранен как \""+savedialoge.getSelectedFile().getAbsolutePath()+'"');
 					}
 				} catch (IOException e) {
-					throw new RuntimeException(e);
+					JOptionPane.showMessageDialog(null,"При сохранении возникла ошибка: "+e.getMessage());
 				}
 			}
 		}

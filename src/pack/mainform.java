@@ -35,7 +35,6 @@ public class mainform extends JFrame {
 		setBounds(50, 50, 800, 480);
 		setExtendedState(MAXIMIZED_BOTH);
 		menuCreate();
-
 		label1.setBounds(10, 10, 119, 24);
 		getContentPane().add(label1);
 
@@ -97,14 +96,17 @@ public class mainform extends JFrame {
 				mainMenu.getMenu(3).getItem(2).setEnabled(access);
 				if (access) {
 					textArea1.setText(dbo.questions.select(hiddenchoice3[choice3.getSelectedIndex()], "qtext"));
-					button4.addActionListener(new ActionListener() {
-						public void actionPerformed(ActionEvent arg0) {
+					button4.addActionListener(new ActionListener(){
+						public void actionPerformed(ActionEvent arg0){
 							// Сохранение при измнении
-							String qid = dbo.questions.select(hiddenchoice3[choice3.getSelectedIndex()], "qid");
-							dbo.questions.update(qid, "qid",
-									new String[] { qid,
-											dbo.cards.select(hiddenchoice2[choice2.getSelectedIndex()], "cid"),
-											textArea1.getText() });
+							dbo.questions.update(
+								hiddenchoice3[choice3.getSelectedIndex()],
+								new String[]{
+									dbo.questions.select(hiddenchoice3[choice3.getSelectedIndex()], "qid"),
+									dbo.cards.select(hiddenchoice2[choice2.getSelectedIndex()], "cid"),
+									textArea1.getText()
+								}
+							);
 							dbo.questions.save();
 							fillchoice3();
 							JOptionPane.showMessageDialog(null,"Вопрос сохранен");
@@ -215,6 +217,26 @@ public class mainform extends JFrame {
 		fileItem.addSeparator();
 		JMenuItem helpButton = new JMenuItem("Справка");
 		helpButton.setFont(font);
+		helpButton.addActionListener(new ActionListener() {           
+            public void actionPerformed(ActionEvent e) {
+            	JDialog helpDialog=new JDialog();
+            	helpDialog.setTitle("Справка");
+    			helpDialog.getContentPane().setLayout(null);
+    			helpDialog.setBounds(getWidth()/2-300,getHeight()/2-180,600,360);
+            	JLabel html=new JLabel("<html><h1><i>Рита придумает как оформить справку красиво</i></h1><hr>Трулала</html>");
+    			html.setBounds(20,0,540,250);
+            	helpDialog.add(html);
+    			JButton ok = new JButton("ok");
+    			ok.setBounds(250,250,100,40);
+    			ok.addActionListener(new ActionListener() {
+    				public void actionPerformed(ActionEvent event) {
+    					helpDialog.setVisible(false);
+    				}
+    			});
+    			helpDialog.add(ok);
+            	helpDialog.setVisible(true);         
+            }           
+        });
 		fileItem.add(helpButton);
 		fileItem.addSeparator();
 		JMenuItem exitButton=new JMenuItem("Выход");
@@ -288,10 +310,51 @@ public class mainform extends JFrame {
 		JMenuItem subjectEdit=new JMenuItem("Дисциплины");
 		subjectEdit.setFont(font);
 		subjectEdit.setEnabled(false);
+		subjectEdit.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				// Редактирование дисциплины
+				String name = "" + JOptionPane.showInputDialog("Название дисциплины",dbo.subjects.select(hiddenchoice1[choice1.getSelectedIndex()],"sname"));
+				if (name.length() > 0) {
+					int res = JOptionPane.showConfirmDialog(null,"Уверены, что хотите внести изменения", "Редактирование дисциплины", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+					if (res == JOptionPane.YES_OPTION){
+						dbo.subjects.update(
+							hiddenchoice1[choice1.getSelectedIndex()],
+							new String[] {
+								dbo.subjects.select(hiddenchoice1[choice1.getSelectedIndex()],"sid"),
+								name
+							}
+						);
+						dbo.subjects.save();
+						fillchoice1();
+					}
+				}
+			}
+        });
 		editItem.add(subjectEdit);
 		JMenuItem cardEdit=new JMenuItem("Билета");
 		cardEdit.setFont(font);
 		cardEdit.setEnabled(false);
+		cardEdit.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				// Редактирование дисциплины
+				String name = "" + JOptionPane.showInputDialog("Название/номер билета",dbo.cards.select(hiddenchoice2[choice2.getSelectedIndex()],"cname"));
+				if (name.length() > 0) {
+					int res = JOptionPane.showConfirmDialog(null,"Уверены, что хотите внести изменения", "Редактирование дисциплины", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+					if (res == JOptionPane.YES_OPTION){
+						dbo.cards.update(
+							hiddenchoice2[choice2.getSelectedIndex()],
+							new String[]{
+								dbo.cards.select(hiddenchoice2[choice2.getSelectedIndex()],"cid"),
+								dbo.cards.select(hiddenchoice2[choice2.getSelectedIndex()],"sid"),
+								name
+							}
+						);
+						dbo.cards.save();
+						fillchoice2();
+					}
+				}
+			}
+        });
 		editItem.add(cardEdit);
 		/*JMenuItem questionEdit=new JMenuItem("Вопроса");
 		questionEdit.setFont(font);

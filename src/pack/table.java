@@ -27,13 +27,8 @@ public class table {
 		rows = r;
 	}
 
-	public void update(String val, String fld, String[] sr) {
-		int j = -1;
-		for (int i = 0; i < rows.length; i++)
-			if (rows[i][getIndex(fld)].equals(val))
-				j = i;
-		if (j >= 0)
-			rows[j] = sr;
+	public void update(int row, String[] sr) {
+		rows[row] = sr;
 	}
 
 	public void delete(int row) {
