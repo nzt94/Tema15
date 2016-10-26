@@ -326,8 +326,8 @@ public class mainform extends JFrame {
 		subjectEdit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				// Редактирование дисциплины
-				String name = "" + JOptionPane.showInputDialog("Название дисциплины",dbo.subjects.select(hiddenchoice1[choice1.getSelectedIndex()],"sname"));
-				if (name.length() > 0) {
+				String name = JOptionPane.showInputDialog("Название дисциплины",dbo.subjects.select(hiddenchoice1[choice1.getSelectedIndex()],"sname"));
+				if (name!=null) {
 					int res = JOptionPane.showConfirmDialog(null,"Уверены, что хотите внести изменения", "Редактирование дисциплины", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 					if (res == JOptionPane.YES_OPTION){
 						dbo.subjects.update(
@@ -350,8 +350,8 @@ public class mainform extends JFrame {
 		cardEdit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				// Редактирование билета
-				String name = "" + JOptionPane.showInputDialog("Название/номер билета",dbo.cards.select(hiddenchoice2[choice2.getSelectedIndex()],"cname"));
-				if (name.length() > 0) {
+				String name = JOptionPane.showInputDialog("Название/номер билета",dbo.cards.select(hiddenchoice2[choice2.getSelectedIndex()],"cnum"));
+				if (name!=null) {
 					int res = JOptionPane.showConfirmDialog(null,"Уверены, что хотите внести изменения", "Редактирование дисциплины", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 					if (res == JOptionPane.YES_OPTION){
 						dbo.cards.update(
