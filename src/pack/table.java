@@ -12,7 +12,12 @@ public class table {
 	}
 
 	public String select(int row, String fld) {
-		return (row >= 0 && row < rows.length) ? rows[row][getIndex(fld)] : "";
+		try{
+			return (row >= 0 && row < rows.length) ? rows[row][getIndex(fld)] : "";
+		}
+		catch(Exception e){
+			return "";
+		}
 	}
 
 	public String[] getRow(int row) {

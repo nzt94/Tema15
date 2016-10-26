@@ -27,6 +27,7 @@ public class mainform extends JFrame {
 	public TextArea textArea1 = new TextArea();
 	public Button button4 = new Button("Сохранить");
 	public Button button5 = new Button("Отмена");
+	private boolean button4_actionType=false;
 
 	public JDialog helpDialog=new JDialog(this);
 
@@ -50,7 +51,6 @@ public class mainform extends JFrame {
 				mainMenu.getMenu(1).getItem(1).setEnabled(access);
 				mainMenu.getMenu(2).getItem(0).setEnabled(access);
 				mainMenu.getMenu(3).getItem(0).setEnabled(access);
-				choice2.removeAll();
 				choice2.setEnabled(access);
 				choice3.removeAll();
 				choice3.setEnabled(false);
@@ -98,22 +98,7 @@ public class mainform extends JFrame {
 				mainMenu.getMenu(3).getItem(2).setEnabled(access);
 				if (access) {
 					textArea1.setText(dbo.questions.select(hiddenchoice3[choice3.getSelectedIndex()], "qtext"));
-					button4.addActionListener(new ActionListener(){
-						public void actionPerformed(ActionEvent arg0){
-							// Сохранение при измнении
-							dbo.questions.update(
-								hiddenchoice3[choice3.getSelectedIndex()],
-								new String[]{
-									dbo.questions.select(hiddenchoice3[choice3.getSelectedIndex()], "qid"),
-									dbo.cards.select(hiddenchoice2[choice2.getSelectedIndex()], "cid"),
-									textArea1.getText()
-								}
-							);
-							dbo.questions.save();
-							fillchoice3();
-							JOptionPane.showMessageDialog(null,"Вопрос сохранен");
-						}
-					});
+					button4_actionType=true;
 				}
 				else
 					textArea1.setText("");
@@ -130,6 +115,40 @@ public class mainform extends JFrame {
 
 		button4.setBounds(520, 364, 80, 24);
 		button4.setEnabled(false);// пока не выбран вопрос, неактивен
+		button4.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent arg0){
+				if(button4_actionType){// Сохранение при измнении
+					dbo.questions.update(
+						hiddenchoice3[choice3.getSelectedIndex()],
+						new String[]{
+							dbo.questions.select(hiddenchoice3[choice3.getSelectedIndex()], "qid"),
+							dbo.cards.select(hiddenchoice2[choice2.getSelectedIndex()], "cid"),
+							textArea1.getText()
+						}
+					);
+					dbo.questions.save();
+					fillchoice3();
+					JOptionPane.showMessageDialog(null,"Вопрос сохранен");
+				}
+				else{// Сохранение при создании
+					dbo.questions.insert(new String[] { "" + (dbo.questions.size() + 1),
+						dbo.cards.select(hiddenchoice2[choice2.getSelectedIndex()], "cid"),
+						textArea1.getText() });
+					dbo.questions.save();
+					fillchoice3();
+					JOptionPane.showMessageDialog(null,"Вопрос сохранен");
+				}
+				textArea1.setText("");
+				textArea1.setEnabled(false);
+				button4.setEnabled(false);
+				button5.setEnabled(false);
+			}
+		});
+
+		button4.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+			}
+		});
 		getContentPane().add(button4);
 
 		button5.setBounds(606, 364, 80, 24);
@@ -159,6 +178,7 @@ public class mainform extends JFrame {
 	}
 
 	private void fillchoice2() {
+		choice2.removeAll();
 		choice2.addItem("Выберите билет");
 		String sid = dbo.subjects.select(hiddenchoice1[choice1.getSelectedIndex()], "sid");
 		for (int i = 0; i < dbo.cards.size(); i++)
@@ -290,17 +310,8 @@ public class mainform extends JFrame {
 				/* Диалог создания вопроса */
 				textArea1.setText("");
 				textArea1.setEnabled(true);
-				button4.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent arg0) {
-						// Сохранение при создании
-						dbo.questions.insert(new String[] { "" + (dbo.questions.size() + 1),
-								dbo.cards.select(hiddenchoice2[choice2.getSelectedIndex()], "cid"),
-								textArea1.getText() });
-						dbo.questions.save();
-						fillchoice3();
-					}
-				});
 				button4.setEnabled(true);
+				button4_actionType=false;
 				button5.setEnabled(true);
 			}
         });
@@ -338,7 +349,7 @@ public class mainform extends JFrame {
 		cardEdit.setEnabled(false);
 		cardEdit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				// Редактирование дисциплины
+				// Редактирование билета
 				String name = "" + JOptionPane.showInputDialog("Название/номер билета",dbo.cards.select(hiddenchoice2[choice2.getSelectedIndex()],"cname"));
 				if (name.length() > 0) {
 					int res = JOptionPane.showConfirmDialog(null,"Уверены, что хотите внести изменения", "Редактирование дисциплины", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
