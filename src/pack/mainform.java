@@ -224,6 +224,7 @@ public class mainform extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 				// Выбор шаблона файла
 				rtf.addTemplate();
+				mainMenu.getMenu(0).getItem(1).setEnabled(rtf.tmpLoaded);
 			}
 		});
 		fileItem.add(setTemplate);
@@ -232,9 +233,13 @@ public class mainform extends JFrame {
 		exportFile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				// Экспорт файла
-				rtf.save(hiddenchoice1[choice1.getSelectedIndex()]);
+				if(choice1.getSelectedIndex()>0)
+					rtf.save(hiddenchoice1[choice1.getSelectedIndex()]);
+				else
+					JOptionPane.showMessageDialog(null,"Не выбрана дисциплина");
 			}
 		});
+		exportFile.setEnabled(false);
 		fileItem.add(exportFile);
 		fileItem.addSeparator();
 		JMenuItem helpButton = new JMenuItem("Справка");

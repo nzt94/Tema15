@@ -5,7 +5,7 @@ import javax.swing.*;
 
 public class export {
 	private File templateFile = null;
-	private boolean tmpLoaded = false;
+	public boolean tmpLoaded = false;
 	private String template = "";
 	private String header = "{\\rtf1\\deflang1049{\\fonttbl{\\f0{Times New Roman}}}\r\n";
 	private String footer = "\r\n}\r\n";
@@ -89,6 +89,8 @@ public class export {
 					while (s.indexOf("\\par", i) >= 0)
 						i = s.indexOf("\\par", i) + 4;
 					template = s.substring(s.indexOf("\\pard"), i);
+					header = s.substring(0,s.indexOf("\\pard"));
+					footer = s.substring(i,s.length());
 					tmpLoaded = true;
 				} finally {
 					in.close();
