@@ -405,9 +405,10 @@ public class mainform extends JFrame {
 					String sid = dbo.subjects.select(hiddenchoice1[choice1.getSelectedIndex()], "sid");
 					for (int i = 0; i < dbo.cards.size(); i++)
 						if (dbo.cards.select(i, "sid").equals(sid)) {
-							for (int j = 0; j < dbo.questions.size(); j++)
+							for (int j = 0; j < dbo.questions.size(); j++){
 								if (dbo.questions.select(j, "cid").equals(dbo.cards.select(i, "cid")))
 									dbo.questions.delete(j);
+							}
 							dbo.cards.delete(i);
 						}
 					dbo.subjects.delete(hiddenchoice1[choice1.getSelectedIndex()]);
@@ -415,6 +416,8 @@ public class mainform extends JFrame {
 					dbo.cards.save();
 					dbo.subjects.save();
 					fillchoice1();
+					choice2.removeAll();
+					choice2.setEnabled(true);
 				}
 			}
 		});
@@ -428,9 +431,10 @@ public class mainform extends JFrame {
 				int res = JOptionPane.showConfirmDialog(null,"Уверены, что хотите удалить билет,\r\nвместе с ним удалятся все вопросы", "Удаление билета", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 				if (res == JOptionPane.YES_OPTION) {
 					String сid = dbo.cards.select(hiddenchoice2[choice2.getSelectedIndex()], "сid");
-					for (int i = 0; i < dbo.questions.size(); i++)
+					for (int i = 0; i < dbo.questions.size(); i++){
 						if (dbo.questions.select(i, "cid").equals(сid))
 							dbo.questions.delete(i);
+					}
 					dbo.cards.delete(hiddenchoice2[choice2.getSelectedIndex()]);
 					dbo.questions.save();
 					dbo.cards.save();
