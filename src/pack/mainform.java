@@ -241,6 +241,18 @@ public class mainform extends JFrame {
 		});
 		exportFile.setEnabled(false);
 		fileItem.add(exportFile);
+		JMenuItem sizeFile=new JMenuItem("Размер файла");
+		sizeFile.setFont(font);
+		sizeFile.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				// Экспорт файла
+				if(choice1.getSelectedIndex()>0)
+					rtf.fileSize(hiddenchoice1[choice1.getSelectedIndex()]);
+				else
+					JOptionPane.showMessageDialog(null,"Не выбрана дисциплина");
+			}
+		});
+		fileItem.add(sizeFile);
 		fileItem.addSeparator();
 		JMenuItem helpButton = new JMenuItem("Справка");
 		helpButton.setFont(font);

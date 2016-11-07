@@ -1,6 +1,8 @@
 package pack;
 
 import java.io.*;
+import java.text.NumberFormat;
+
 import javax.swing.*;
 
 public class export {
@@ -46,6 +48,28 @@ public class export {
 					JOptionPane.showMessageDialog(null,"При сохранении возникла ошибка: "+e.getMessage());
 				}
 			}
+		}
+		else
+			JOptionPane.showMessageDialog(null,"Укажите шаблон для формирования файла");
+	}
+	public void fileSize(int row) {
+		if (tmpLoaded){
+			String filetxt = "";
+			for (int i = 0; i < dbo.cards.size(); i++) {
+				if (dbo.cards.select(i, "sid").equals(dbo.subjects.select(row, "sid"))) {
+					int k = 1;
+					String quest = "";
+					for (int j = 0; j < dbo.questions.size(); j++)
+						if (dbo.questions.select(j, "cid").equals(dbo.cards.select(i, "cid")))
+							quest += "\\\\pard " + encode_rtf((k++) + ". " + dbo.questions.select(j, "qtext"))
+									+ "\\\\par\r\n";
+					filetxt += append(dbo.cards.select(i, "cnum"), dbo.subjects.select(row, "sname"), quest);
+				}
+			}
+			NumberFormat nf = NumberFormat.getInstance();
+	        nf.setMaximumFractionDigits(2);
+			String size=nf.format(((float)(header + filetxt + footer).length())/1024);
+			JOptionPane.showMessageDialog(null,"Предполагаемый размер файла: "+size+" КБ.");
 		}
 		else
 			JOptionPane.showMessageDialog(null,"Укажите шаблон для формирования файла");
