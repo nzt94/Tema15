@@ -50,9 +50,9 @@ public class table {
 	}
 
 	public table(String tbl) {
-		filePath = "/dbase/" + tbl + ".csv";
-		JOptionPane.showMessageDialog(null,filePath);
+		filePath = "./dbase/" + tbl + ".csv";
 		File file = new File(filePath);
+		JOptionPane.showMessageDialog(null,file.exists());
 		if (file.exists()) {
 			try {
 				BufferedReader in=new BufferedReader(new InputStreamReader(new FileInputStream(file),"UTF8"));
