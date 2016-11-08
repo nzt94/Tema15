@@ -84,7 +84,7 @@ public class export {
 	private String encode_rtf(String s) {
 		String s3 = "";
 		try {
-			byte[] arr = s.getBytes();
+			byte[] arr = s.getBytes("cp1251");
 			for (int i = 0; i < arr.length; i++) {
 				int j = arr[i] > 0 ? arr[i] : 256 + arr[i];
 				s3 += ((j < 16) ? "\\\\'0" : "\\\\'") + Integer.toString(j, 16);
@@ -112,6 +112,7 @@ public class export {
 						s += sl + "\r\n";
 					while (s.indexOf("\\par", i) >= 0)
 						i = s.indexOf("\\par", i) + 4;
+					s = new String(s.getBytes(),"cp1251");
 					template = s.substring(s.indexOf("\\pard"), i);
 					header = s.substring(0,s.indexOf("\\pard"));
 					footer = s.substring(i,s.length());
