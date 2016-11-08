@@ -2,8 +2,6 @@ package pack;
 
 import java.io.*;
 
-import javax.swing.JOptionPane;
-
 public class table {
 	private String filePath = "";
 	private String[] titles;
@@ -52,7 +50,6 @@ public class table {
 	public table(String tbl) {
 		filePath = "./dbase/" + tbl + ".csv";
 		File file = new File(filePath);
-		JOptionPane.showMessageDialog(null,System.getProperty("user.dir"));
 		if (file.exists()) {
 			try {
 				BufferedReader in=new BufferedReader(new InputStreamReader(new FileInputStream(file),"UTF8"));
