@@ -112,7 +112,6 @@ public class export {
 						s += sl + "\r\n";
 					while (s.indexOf("\\par", i) >= 0)
 						i = s.indexOf("\\par", i) + 4;
-					s = new String(s.getBytes(),"cp1251");
 					template = s.substring(s.indexOf("\\pard"), i);
 					header = s.substring(0,s.indexOf("\\pard"));
 					footer = s.substring(i,s.length());
