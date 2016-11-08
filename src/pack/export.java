@@ -84,12 +84,12 @@ public class export {
 	private String encode_rtf(String s) {
 		String s3 = "";
 		try {
-			byte[] arr = s.getBytes("cp1251");
+			byte[] arr = s.getBytes();
 			for (int i = 0; i < arr.length; i++) {
 				int j = arr[i] > 0 ? arr[i] : 256 + arr[i];
 				s3 += ((j < 16) ? "\\\\'0" : "\\\\'") + Integer.toString(j, 16);
 			}
-		} catch (UnsupportedEncodingException e) {
+		} catch (Exception e) {
 			s3 = s;
 		}
 		return s3;
