@@ -48,7 +48,7 @@ public class table {
 	}
 
 	public table(String tbl) {
-		filePath = ".\\dbase\\" + tbl + ".csv";
+		filePath = "./dbase/" + tbl + ".csv";
 		File file = new File(filePath);
 		if (file.exists()) {
 			try {
