@@ -2,6 +2,8 @@ package pack;
 
 import java.io.*;
 
+import javax.swing.JOptionPane;
+
 public class table {
 	private String filePath = "";
 	private String[] titles;
@@ -48,7 +50,8 @@ public class table {
 	}
 
 	public table(String tbl) {
-		filePath = "./dbase/" + tbl + ".csv";
+		filePath = "/dbase/" + tbl + ".csv";
+		JOptionPane.showMessageDialog(null,filePath);
 		File file = new File(filePath);
 		if (file.exists()) {
 			try {
