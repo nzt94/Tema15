@@ -258,7 +258,7 @@ public class mainform extends JFrame {
 		helpButton.setFont(font);
     	helpDialog.setTitle("Справка");
 		helpDialog.getContentPane().setLayout(null);
-    	JLabel html=new JLabel("<html><h1><i>Рита придумает как оформить справку красиво</i></h1><hr>Трулала</html>");
+    	JLabel html=new JLabel("<html><h1>Экспорт файла</h1><ul><li>Выбрать шаблон</li><li>Выбрать дисциплину</li><li>Экспортировать файл</li></ul></html>");
 		html.setBounds(20,0,560,250);
     	helpDialog.add(html);
     	helpDialog.setResizable(false);
